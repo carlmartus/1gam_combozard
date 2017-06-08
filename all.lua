@@ -38,6 +38,8 @@ function _init()
 end
 
 function _update60()
+	timer_step()
+
 	for a in all(actors) do
 		if a.upd(a) then
 			del(actors, a)
@@ -103,6 +105,8 @@ function _draw()
 	end
 
 	camera(0, 0)
+
+	timer_draw()
 	infobox_draw()
 	if slide > 0 then
 		slide_draw()
@@ -433,11 +437,6 @@ function player_upd(a)
 	a.dx = 0
 
 	if collect_keys(a) then
-		--[[
-		printh("====")
-		for i in all(a.keyhistory) do
-			printh(i)
-		end]]--
 		player_combo(a)
 	end
 
@@ -619,8 +618,6 @@ function bat_build_links()
 				end
 			end
 		end
-
-		printh(#a.links)
 	end
 end
 
@@ -684,6 +681,7 @@ end
 function load_scene()
 	slide_screen()
 	sfx(6)
+	timer_restart()
 
 	-- clear lists
 	actors = {}
@@ -789,6 +787,10 @@ function infobox_isatinfo(a)
 	if mask > 0 then
 		if mask != infocurrent then
 			infocurrent = mask
+
+			if mask == 5 then
+				timer_stop()
+			end
 		end
 	elseif infocurrent > 0 then
 		infocurrent = 0
@@ -956,4 +958,32 @@ function set_animation(
 	end
 end
 
+-- timer -----------------------
+
+timer_on = false
+timer_ticks = 0
+
+function timer_restart()
+	timer_on = true
+	timer_ticks = 0
+end
+
+function timer_stop()
+	timer_on = false
+end
+
+function timer_step()
+	if timer_on then timer_ticks += 1 end
+end
+
+function timer_draw()
+	local elapsed= flr(timer_ticks / 6) / 10
+
+	if timer_on == false then
+		rectfill(98, 0, 128, 20, 0)
+		print("time:", 101, 0, 7)
+		print(elapsed, 101, 6, 7)
+		print("secs.", 101, 12, 7)
+	end
+end
 
